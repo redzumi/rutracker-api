@@ -1,0 +1,23 @@
+{
+  "name": "rutracker-api",
+  "version": "1.0.0",
+  "main": "build/index.js",
+  "author": "Redzumi",
+  "scripts": {
+    "build": "babel src -d build"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "babel-plugin-transform-runtime": "^6.15.0",
+    "bluebird": "^3.4.7",
+    "cheerio": "^0.22.0",
+    "limitme": "^0.0.2",
+    "request": "^2.79.0",
+    "windows-1251": "^1.0.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.18.0",
+    "babel-plugin-transform-class-properties": "^6.19.0",
+    "babel-preset-latest": "^6.16.0"
+  }
+}
