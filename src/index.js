@@ -4,7 +4,7 @@ import Promise          from 'bluebird';
 import windows1251      from 'windows-1251';
 import RateLimiter      from 'limitme';
 
-import { parseSearch, parseTopic }
+import { parseSearch, parseTopic, parseCaptcha }
                         from './parsingutils';
 
 const promisify   = Promise.promisify;
@@ -18,26 +18,31 @@ const limiter     = new RateLimiter(1000);
 const URLS = {
   login:      'http://rutracker.org/forum/login.php',
   search:     'http://rutracker.org/forum/tracker.php',
-  download:   'http://rutracker.org/forum/dl.php',
-  forum:      'http://rutracker.org/forum/'
+  download:   'http://rutracker.org/forum/dl.php'
 };
 
-export class RutrackerAPI {
+class RutrackerAPI {
   constructor() {
     this._loggedOn   = false;
   }
 
-  login = async (username, password) => {
-    let response = await post({
+  login = async (username, password, options) => {
+    let postData = {
       url: URLS.login,
       formData: {
         login_username: username,
         login_password: password,
-        login: 'Вход'
+        login: 'вход'
       }
-    });
+    };
+    if(options) Object.assign(postData.formData, options);
 
-    this._loggedOn = (response.statusCode == 302);
+    let response = await post(postData);
+    if(response.body.includes('BB.toggle_top_login()')) //login panel
+      throw parseCaptcha(windows1251.decode(response.body, { mode: 'html' }));
+
+    this._loggedOn = true;
+
     return this._loggedOn;
   };
 
@@ -91,9 +96,6 @@ class SearchCursor {
     let response = await post({ url: URLS.search, qs: data, encoding: 'binary' });
     return parseSearch(windows1251.decode(response.body, {mode: 'html'}));
   };
-
-  formatSize = (size_in_bytes) => {
-    let size_in_megabytes = size_in_bytes / (1024 * 1024);
-    return (size_in_megabytes.toString()).slice(0, 7);
-  }
 }
+
+export default RutrackerAPI;

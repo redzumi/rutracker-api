@@ -3,6 +3,11 @@ import cheerio          from 'cheerio';
 let parseSearch = (html) => {
   let $ = cheerio.load(html, { decodeEntities: false });
 
+  let formatSize = (size_in_bytes) => {
+    let size_in_megabytes = size_in_bytes / (1024 * 1024);
+    return (size_in_megabytes.toString()).slice(0, 7);
+  };
+
   let tracks  = $('#tor-tbl tbody').find('tr');
   let results = [];
 
@@ -15,10 +20,10 @@ let parseSearch = (html) => {
       category : track.find('.f-name').find('.f-name a').html(),
       title    : track.find('.t-title').find('div a').html(),
       author   : track.find('.u-name').find('div a').html(),
-      size     : this.formatSize(track.find('.tor-size').find('u').html()),
+      size     : formatSize(track.find('.tor-size').find('u').html()),
       seeds    : track.find('.seedmed').html(),
       leechs   : track.find('.leechmed').find('b').html(),
-      url      : URLS.forum + track.find('.t-title').find('div a').attr('href')
+      url      : 'http://rutracker.org/forum/' + track.find('.t-title').find('div a').attr('href')
     });
   }
 
@@ -37,6 +42,7 @@ let parseTopic = (html) => {
     raw_body  : ''
   };
 
+  // TODO: FIX ME
   let isBody = true;
   topic.find('.post_body').children().each((index, elm) => {
     if(elm.attribs.id == 'tor-reged') isBody = false;
@@ -46,4 +52,18 @@ let parseTopic = (html) => {
   return result;
 };
 
-export { parseSearch, parseTopic };
+let parseCaptcha = (html) => {
+  let $ = cheerio.load(html, { decodeEntities: false });
+  let loginBox   = $('#login-form-full tr').next();
+  let captchaBox = loginBox.find('.login-ssl-block').prev().find('td').next();
+
+  //$('div p').html() - 4:49
+  return {
+    message: 'Captcha. Maybe incorrect username or password.',
+    captcha   : 'http://' + captchaBox.find('div img').attr('src'),
+    cap_sid   : captchaBox.find('div').next().find('input').attr('value'),
+    cap_code  : captchaBox.find('div').next().find('input').next().attr('name'),
+  };
+};
+
+export { parseSearch, parseTopic, parseCaptcha };
