@@ -123,9 +123,9 @@ Topic information.
 
 Option | Type | Default Value | Description |
 :---:|:---:|:---:|:---:|
-url | string | - | e.g. ```"http://rutracker.org/forum/viewtopic.php?t=***"``` |
+id | string | - | Topic ID (e.g. ```"5351337"```) |
 ```javascript
-rutracker.topic('http://rutracker.org/forum/viewtopic.php?t=5351337')
+rutracker.topic('5351337')
   .then((topic) => {
     ...
   })
