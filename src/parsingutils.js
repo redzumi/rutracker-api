@@ -60,7 +60,7 @@ let parseCaptcha = (html) => {
   //$('div p').html() - 4:49
   return {
     message: 'Captcha. Maybe incorrect username or password.',
-    captcha   : 'http://' + captchaBox.find('div img').attr('src'),
+    captcha   : 'http:' + captchaBox.find('div img').attr('src'),
     cap_sid   : captchaBox.find('div').next().find('input').attr('value'),
     cap_code  : captchaBox.find('div').next().find('input').next().attr('name'),
   };

@@ -18,7 +18,8 @@ const limiter     = new RateLimiter(1000);
 const URLS = {
   login:      'http://rutracker.org/forum/login.php',
   search:     'http://rutracker.org/forum/tracker.php',
-  download:   'http://rutracker.org/forum/dl.php'
+  download:   'http://rutracker.org/forum/dl.php',
+  topic:      'http://rutracker.org/forum/viewtopic.php'
 };
 
 class RutrackerAPI {
@@ -35,7 +36,9 @@ class RutrackerAPI {
         login: 'вход'
       }
     };
-    if(options) Object.assign(postData.formData, options);
+
+    if(options)
+      Object.assign(postData.formData, options);
 
     let response = await post(postData);
     if(response.body.includes('BB.toggle_top_login()')) //login panel
@@ -51,9 +54,9 @@ class RutrackerAPI {
     return new SearchCursor(query);
   };
 
-  topic = async (url) => {
-    let response = await post({ url: url, encoding: 'binary' });
-    return parseTopic(windows1251.decode(response.body, {mode: 'html'}));
+  topic = async (id) => {
+    let response = await post({ url: URLS.topic, qs: { t: id }, encoding: 'binary' });
+    return parseTopic(windows1251.decode(response.body, { mode: 'html' }));
   };
 
   download = (id, path) => {
@@ -94,7 +97,7 @@ class SearchCursor {
     if(this._page)  data.start  = this._page * 50; // 1 page = 50 topics
 
     let response = await post({ url: URLS.search, qs: data, encoding: 'binary' });
-    return parseSearch(windows1251.decode(response.body, {mode: 'html'}));
+    return parseSearch(windows1251.decode(response.body, { mode: 'html' }));
   };
 }
 

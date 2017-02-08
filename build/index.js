@@ -55,7 +55,8 @@ var limiter = new _limitme2.default(1000);
 var URLS = {
   login: 'http://rutracker.org/forum/login.php',
   search: 'http://rutracker.org/forum/tracker.php',
-  download: 'http://rutracker.org/forum/dl.php'
+  download: 'http://rutracker.org/forum/dl.php',
+  topic: 'http://rutracker.org/forum/viewtopic.php'
 };
 
 var RutrackerAPI = function RutrackerAPI() {
@@ -78,6 +79,7 @@ var RutrackerAPI = function RutrackerAPI() {
                   login: 'вход'
                 }
               };
+
 
               if (options) (0, _assign2.default)(postData.formData, options);
 
@@ -119,14 +121,14 @@ var RutrackerAPI = function RutrackerAPI() {
   };
 
   this.topic = function () {
-    var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(url) {
+    var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(id) {
       var response;
       return _regenerator2.default.wrap(function _callee2$(_context2) {
         while (1) {
           switch (_context2.prev = _context2.next) {
             case 0:
               _context2.next = 2;
-              return post({ url: url, encoding: 'binary' });
+              return post({ url: URLS.topic, qs: { t: id }, encoding: 'binary' });
 
             case 2:
               response = _context2.sent;
