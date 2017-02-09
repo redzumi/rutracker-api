@@ -63,7 +63,7 @@ rutracker.login('login', 'pass', {
 
 #### search
 
-Forum search.
+Returns SearchCursor.
 
 Option | Type | Default Value | Description |
 :---:|:---:|:---:|:---:|
@@ -77,6 +77,8 @@ rutracker.search('Kure-nai').exec()
   })
 ```
 
+
+#### SearchCursor
 ##### .page
 
 Maximum pages count is 10, and maximum topics count is 500. 
@@ -130,7 +132,7 @@ rutracker.topic('5351337')
     ...
   })
 ```
-Topic is an objects with the following schema:
+Topic is an object with the following schema:
 
 Property | Type | Note
 ---|---|---|

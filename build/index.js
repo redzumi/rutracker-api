@@ -32,10 +32,6 @@ var _bluebird = require('bluebird');
 
 var _bluebird2 = _interopRequireDefault(_bluebird);
 
-var _windows = require('windows-1251');
-
-var _windows2 = _interopRequireDefault(_windows);
-
 var _limitme = require('limitme');
 
 var _limitme2 = _interopRequireDefault(_limitme);
@@ -53,6 +49,7 @@ var post = promisify(req.post);
 var limiter = new _limitme2.default(1000);
 
 var URLS = {
+  index: 'http://rutracker.org/forum/index.php',
   login: 'http://rutracker.org/forum/login.php',
   search: 'http://rutracker.org/forum/tracker.php',
   download: 'http://rutracker.org/forum/dl.php',
@@ -71,6 +68,18 @@ var RutrackerAPI = function RutrackerAPI() {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
+              _context.next = 2;
+              return _this.checkMaintenance();
+
+            case 2:
+              if (!_context.sent) {
+                _context.next = 4;
+                break;
+              }
+
+              throw new Error('Scheduled maintenance.');
+
+            case 4:
               postData = {
                 url: URLS.login,
                 formData: {
@@ -83,26 +92,26 @@ var RutrackerAPI = function RutrackerAPI() {
 
               if (options) (0, _assign2.default)(postData.formData, options);
 
-              _context.next = 4;
+              _context.next = 8;
               return post(postData);
 
-            case 4:
+            case 8:
               response = _context.sent;
 
               if (!response.body.includes('BB.toggle_top_login()')) {
-                _context.next = 7;
+                _context.next = 11;
                 break;
               }
 
-              throw (0, _parsingutils.parseCaptcha)(_windows2.default.decode(response.body, { mode: 'html' }));
+              throw (0, _parsingutils.parseCaptcha)((0, _parsingutils.toWin1251)(response.body));
 
-            case 7:
+            case 11:
 
               _this._loggedOn = true;
 
               return _context.abrupt('return', _this._loggedOn);
 
-            case 9:
+            case 13:
             case 'end':
               return _context.stop();
           }
@@ -128,11 +137,14 @@ var RutrackerAPI = function RutrackerAPI() {
           switch (_context2.prev = _context2.next) {
             case 0:
               _context2.next = 2;
-              return post({ url: URLS.topic, qs: { t: id }, encoding: 'binary' });
+              return post({
+                url: URLS.topic,
+                qs: { t: id },
+                encoding: 'binary' });
 
             case 2:
               response = _context2.sent;
-              return _context2.abrupt('return', (0, _parsingutils.parseTopic)(_windows2.default.decode(response.body, { mode: 'html' })));
+              return _context2.abrupt('return', (0, _parsingutils.parseTopic)((0, _parsingutils.toWin1251)(response.body)));
 
             case 4:
             case 'end':
@@ -157,8 +169,35 @@ var RutrackerAPI = function RutrackerAPI() {
     });
   };
 
+  this.checkMaintenance = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3() {
+    var response, body;
+    return _regenerator2.default.wrap(function _callee3$(_context3) {
+      while (1) {
+        switch (_context3.prev = _context3.next) {
+          case 0:
+            _context3.next = 2;
+            return post({
+              url: URLS.index,
+              encoding: 'binary' });
+
+          case 2:
+            response = _context3.sent;
+            body = (0, _parsingutils.toWin1251)(response.body);
+            return _context3.abrupt('return', body.includes('Форум временно отключен'));
+
+          case 5:
+          case 'end':
+            return _context3.stop();
+        }
+      }
+    }, _callee3, _this);
+  }));
+
   this._loggedOn = false;
-};
+}
+
+//every day in 4:40
+;
 
 var SearchCursor = function SearchCursor(query) {
   var _this2 = this;
@@ -175,11 +214,11 @@ var SearchCursor = function SearchCursor(query) {
     return _this2;
   };
 
-  this.exec = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3() {
+  this.exec = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4() {
     var data, response;
-    return _regenerator2.default.wrap(function _callee3$(_context3) {
+    return _regenerator2.default.wrap(function _callee4$(_context4) {
       while (1) {
-        switch (_context3.prev = _context3.next) {
+        switch (_context4.prev = _context4.next) {
           case 0:
             data = { nm: _this2._query };
 
@@ -187,25 +226,30 @@ var SearchCursor = function SearchCursor(query) {
             if (_this2._forum) data.f = _this2._forum;
             if (_this2._page) data.start = _this2._page * 50; // 1 page = 50 topics
 
-            _context3.next = 5;
-            return post({ url: URLS.search, qs: data, encoding: 'binary' });
+            _context4.next = 5;
+            return post({
+              url: URLS.search,
+              qs: data,
+              encoding: 'binary' });
 
           case 5:
-            response = _context3.sent;
-            return _context3.abrupt('return', (0, _parsingutils.parseSearch)(_windows2.default.decode(response.body, { mode: 'html' })));
+            response = _context4.sent;
+            return _context4.abrupt('return', (0, _parsingutils.parseSearch)((0, _parsingutils.toWin1251)(response.body)));
 
           case 7:
           case 'end':
-            return _context3.stop();
+            return _context4.stop();
         }
       }
-    }, _callee3, _this2);
+    }, _callee4, _this2);
   }));
 
   if (!query) throw new Error('Query string is required.');
+
   this._query = query;
   this._forum = null;
   this._page = null;
+
   return this;
 };
 

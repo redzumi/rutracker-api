@@ -3,11 +3,15 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.parseCaptcha = exports.parseTopic = exports.parseSearch = undefined;
+exports.toWin1251 = exports.parseCaptcha = exports.parseTopic = exports.parseSearch = undefined;
 
 var _cheerio = require('cheerio');
 
 var _cheerio2 = _interopRequireDefault(_cheerio);
+
+var _windows = require('windows-1251');
+
+var _windows2 = _interopRequireDefault(_windows);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -79,6 +83,11 @@ var parseCaptcha = function parseCaptcha(html) {
   };
 };
 
+var toWin1251 = function toWin1251(data) {
+  return _windows2.default.decode(data, { mode: 'html' });
+};
+
 exports.parseSearch = parseSearch;
 exports.parseTopic = parseTopic;
 exports.parseCaptcha = parseCaptcha;
+exports.toWin1251 = toWin1251;

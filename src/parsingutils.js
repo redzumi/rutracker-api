@@ -1,4 +1,5 @@
 import cheerio          from 'cheerio';
+import windows1251      from 'windows-1251';
 
 let parseSearch = (html) => {
   let $ = cheerio.load(html, { decodeEntities: false });
@@ -66,4 +67,8 @@ let parseCaptcha = (html) => {
   };
 };
 
-export { parseSearch, parseTopic, parseCaptcha };
+let toWin1251 = (data) => {
+  return windows1251.decode(data, { mode: 'html' });
+};
+
+export { parseSearch, parseTopic, parseCaptcha, toWin1251 };
