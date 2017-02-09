@@ -74,7 +74,6 @@ var parseCaptcha = function parseCaptcha(html) {
   var loginBox = $('#login-form-full tr').next();
   var captchaBox = loginBox.find('.login-ssl-block').prev().find('td').next();
 
-  //$('div p').html() - 4:49
   return {
     message: 'Captcha. Maybe incorrect username or password.',
     captcha: 'http:' + captchaBox.find('div img').attr('src'),
